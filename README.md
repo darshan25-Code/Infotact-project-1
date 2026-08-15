@@ -3,10 +3,10 @@
 Team internship project developed by a group of four members.
 
 ## Team
-- Team Leader: Darshan
-- Luv :
-- Priyanshu :
-- Arijit:
+- Darshan: Member 1 (Team Leader)
+- Luv : Member 2
+- Priyanshu : Member 3
+- Arijit: Member 4
 
 ## Project
 Project details will be added here.
