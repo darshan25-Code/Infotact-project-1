@@ -9,6 +9,6 @@ app.use(cors());
 app.use(express.json());
 
 // Health check API
-app.use("api/health",healthRoutes)
+app.use("/api/health",healthRoutes)
 
 module.exports = app;
