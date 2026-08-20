@@ -20,11 +20,10 @@ const telemetrySchema = new mongoose.Schema(
             type: Number
         },
 
-        timestamp: {
-            type: Date,
-            required: true,
-            default: Date.now
-        },
+     timestamp: {
+  type: Date,
+  default: Date.now
+},
 
         metadata: {
             type: Object,
@@ -36,6 +35,10 @@ const telemetrySchema = new mongoose.Schema(
     }
 );
 
-const Telemetry = mongoose.model("Telemetry", telemetrySchema);
+const Telemetry = mongoose.model(
+    "Telemetry",
+    telemetrySchema,
+    "telemetry"
+);
 
-module.exports = Telemetry;
+module.exports = Telemetry
