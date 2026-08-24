@@ -53,6 +53,28 @@ const createTelemetry = async (req, res) => {
     }
 };
 
+const getAllTelemetry = async (req, res) => {
+    try {
+        const telemetry = await Telemetry.find()
+            .sort({ timestamp: -1 })
+            .limit(100);
+
+        res.status(200).json({
+            success: true,
+            count: telemetry.length,
+            data: telemetry
+        });
+    } catch (error) {
+        console.error("Telemetry retrieval error:", error.message);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve telemetry data"
+        });
+    }
+};
+
 module.exports = {
-    createTelemetry
+    createTelemetry,
+    getAllTelemetry
 };
