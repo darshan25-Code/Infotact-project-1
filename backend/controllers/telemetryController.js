@@ -77,8 +77,38 @@ const getAllTelemetry = async (req, res) => {
 const getTelemetryBySensor = async (req, res) => {
     try {
         const { sensorId } = req.params;
+        const { start, end } = req.query;
+        if (start && isNaN(new Date(start).getTime())) {
+    return res.status(400).json({
+        success: false,
+        message: "Invalid start date"
+    });
+}
 
-        const telemetry = await Telemetry.find({ sensorId })
+if (end && isNaN(new Date(end).getTime())) {
+    return res.status(400).json({
+        success: false,
+        message: "Invalid end date"
+    });
+}
+
+        const filter = {
+            sensorId
+        };
+
+        if (start || end) {
+            filter.timestamp = {};
+
+            if (start) {
+                filter.timestamp.$gte = new Date(start);
+            }
+
+            if (end) {
+                filter.timestamp.$lte = new Date(end);
+            }
+        }
+
+        const telemetry = await Telemetry.find(filter)
             .sort({ timestamp: -1 })
             .limit(100);
 
