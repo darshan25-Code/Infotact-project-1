@@ -74,7 +74,32 @@ const getAllTelemetry = async (req, res) => {
     }
 };
 
+const getTelemetryBySensor = async (req, res) => {
+    try {
+        const { sensorId } = req.params;
+
+        const telemetry = await Telemetry.find({ sensorId })
+            .sort({ timestamp: -1 })
+            .limit(100);
+
+        res.status(200).json({
+            success: true,
+            sensorId,
+            count: telemetry.length,
+            data: telemetry
+        });
+    } catch (error) {
+        console.error("Sensor telemetry retrieval error:", error.message);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve sensor telemetry"
+        });
+    }
+};
+
 module.exports = {
     createTelemetry,
-    getAllTelemetry
+    getAllTelemetry,
+    getTelemetryBySensor
 };
