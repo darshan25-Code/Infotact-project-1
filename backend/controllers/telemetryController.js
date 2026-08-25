@@ -128,8 +128,110 @@ if (end && isNaN(new Date(end).getTime())) {
     }
 };
 
+const getTelemetryStats = async (req, res) => {
+    try {
+        const { sensorId } = req.params;
+
+        const stats = await Telemetry.aggregate([
+            {
+                $match: {
+                    sensorId: sensorId
+                }
+            },
+            {
+                $group: {
+                    _id: "$sensorId",
+
+                    count: {
+                        $sum: 1
+                    },
+
+                    averageTemperature: {
+                        $avg: "$temperature"
+                    },
+
+                    minimumTemperature: {
+                        $min: "$temperature"
+                    },
+
+                    maximumTemperature: {
+                        $max: "$temperature"
+                    },
+
+                    averageHumidity: {
+                        $avg: "$humidity"
+                    },
+
+                    minimumHumidity: {
+                        $min: "$humidity"
+                    },
+
+                    maximumHumidity: {
+                        $max: "$humidity"
+                    },
+
+                    averagePressure: {
+                        $avg: "$pressure"
+                    },
+
+                    minimumPressure: {
+                        $min: "$pressure"
+                    },
+
+                    maximumPressure: {
+                        $max: "$pressure"
+                    }
+                }
+            }
+        ]);
+
+        if (stats.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No telemetry data found for this sensor"
+            });
+        }
+
+        const result = stats[0];
+
+        res.status(200).json({
+            success: true,
+            sensorId: result._id,
+            statistics: {
+                count: result.count,
+
+                temperature: {
+                    average: result.averageTemperature,
+                    minimum: result.minimumTemperature,
+                    maximum: result.maximumTemperature
+                },
+
+                humidity: {
+                    average: result.averageHumidity,
+                    minimum: result.minimumHumidity,
+                    maximum: result.maximumHumidity
+                },
+
+                pressure: {
+                    average: result.averagePressure,
+                    minimum: result.minimumPressure,
+                    maximum: result.maximumPressure
+                }
+            }
+        });
+    } catch (error) {
+        console.error("Telemetry statistics error:", error.message);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to calculate telemetry statistics"
+        });
+    }
+};
+
 module.exports = {
     createTelemetry,
     getAllTelemetry,
-    getTelemetryBySensor
+    getTelemetryBySensor,
+    getTelemetryStats
 };
