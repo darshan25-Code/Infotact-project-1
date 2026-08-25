@@ -11,24 +11,7 @@ const createTelemetry = async (req, res) => {
             metadata
         } = req.body;
 
-        if (!sensorId) {
-            return res.status(400).json({
-                success: false,
-                message: "sensorId is required"
-            });
-        }
-
-        if (
-            temperature === undefined &&
-            humidity === undefined &&
-            pressure === undefined
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "At least one telemetry value is required"
-            });
-        }
-
+   
         const telemetry = await Telemetry.create({
             sensorId,
             temperature,

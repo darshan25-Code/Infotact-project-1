@@ -8,10 +8,12 @@ const {
     getLatestTelemetryBySensor,
     getLatestTelemetryForAllSensors
 } = require("../controllers/telemetryController");
+const validateTelemetry = require("../middleware/telemetryValidation");
+
+
 
 const router = express.Router();
-
-router.post("/", createTelemetry);
+router.post("/", validateTelemetry, createTelemetry);
 
 router.get("/", getAllTelemetry);
 
