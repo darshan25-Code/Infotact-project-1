@@ -229,9 +229,85 @@ const getTelemetryStats = async (req, res) => {
     }
 };
 
+const getLatestTelemetryBySensor = async (req, res) => {
+    try {
+        const { sensorId } = req.params;
+
+        const telemetry = await Telemetry.findOne({ sensorId })
+            .sort({ timestamp: -1 });
+
+        if (!telemetry) {
+            return res.status(404).json({
+                success: false,
+                message: "No telemetry data found for this sensor"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: telemetry
+        });
+    } catch (error) {
+        console.error("Latest sensor telemetry error:", error.message);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve latest sensor telemetry"
+        });
+    }
+};
+
+const getLatestTelemetryForAllSensors = async (req, res) => {
+    try {
+        const telemetry = await Telemetry.aggregate([
+            {
+                $sort: {
+                    timestamp: -1
+                }
+            },
+            {
+                $group: {
+                    _id: "$sensorId",
+                    latestReading: {
+                        $first: "$$ROOT"
+                    }
+                }
+            },
+            {
+                $replaceRoot: {
+                    newRoot: "$latestReading"
+                }
+            },
+            {
+                $sort: {
+                    timestamp: -1
+                }
+            }
+        ]);
+
+        res.status(200).json({
+            success: true,
+            count: telemetry.length,
+            data: telemetry
+        });
+    } catch (error) {
+        console.error(
+            "Latest telemetry retrieval error:",
+            error.message
+        );
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve latest telemetry"
+        });
+    }
+};
+
 module.exports = {
     createTelemetry,
     getAllTelemetry,
     getTelemetryBySensor,
-    getTelemetryStats
+    getTelemetryStats,
+    getLatestTelemetryBySensor,
+    getLatestTelemetryForAllSensors
 };
