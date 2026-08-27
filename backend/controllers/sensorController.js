@@ -44,6 +44,99 @@ const registerSensor = async (req, res) => {
     }
 };
 
+const getAllSensors = async (req, res) => {
+    try {
+        const sensors = await Sensor.find()
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            count: sensors.length,
+            data: sensors
+        });
+    } catch (error) {
+        console.error("Get sensors error:", error.message);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve sensors"
+        });
+    }
+};
+
+const getSensorById = async (req, res) => {
+    try {
+        const { sensorId } = req.params;
+
+        const sensor = await Sensor.findOne({ sensorId });
+
+        if (!sensor) {
+            return res.status(404).json({
+                success: false,
+                message: "Sensor not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: sensor
+        });
+    } catch (error) {
+        console.error("Get sensor error:", error.message);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve sensor"
+        });
+    }
+};
+
+const updateSensorStatus = async (req, res) => {
+    try {
+        const { sensorId } = req.params;
+        const { status } = req.body;
+
+        if (!["active", "inactive"].includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: "Status must be active or inactive"
+            });
+        }
+
+        const sensor = await Sensor.findOneAndUpdate(
+            { sensorId },
+            { status },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        if (!sensor) {
+            return res.status(404).json({
+                success: false,
+                message: "Sensor not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Sensor status updated successfully",
+            data: sensor
+        });
+    } catch (error) {
+        console.error("Sensor status update error:", error.message);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to update sensor status"
+        });
+    }
+};
+
 module.exports = {
-    registerSensor
+    registerSensor,
+    getAllSensors,
+    getSensorById,
+    updateSensorStatus
 };
