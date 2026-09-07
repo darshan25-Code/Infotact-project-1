@@ -6,23 +6,60 @@ const {
     getTelemetryBySensor,
     getTelemetryStats,
     getLatestTelemetryBySensor,
-    getLatestTelemetryForAllSensors
+    getLatestTelemetryForAllSensors,
+    getRecentTelemetry
 } = require("../controllers/telemetryController");
-const validateTelemetry = require("../middleware/telemetryValidation");
 
+const validateTelemetry =
+    require("../middleware/telemetryValidation");
 
+const validateSensorExists =
+    require("../middleware/sensorValidation");
 
 const router = express.Router();
-router.post("/", validateTelemetry, createTelemetry);
 
-router.get("/", getAllTelemetry);
+// Create telemetry
+router.post(
+    "/",
+    validateTelemetry,
+    validateSensorExists,
+    createTelemetry
+);
 
-router.get("/latest", getLatestTelemetryForAllSensors);
+// Latest telemetry for all sensors
+router.get(
+    "/latest",
+    getLatestTelemetryForAllSensors
+);
 
-router.get("/:sensorId/stats", getTelemetryStats);
+// Recent telemetry
+router.get(
+    "/recent",
+    getRecentTelemetry
+);
 
-router.get("/:sensorId/latest", getLatestTelemetryBySensor);
+// Statistics for sensor
+router.get(
+    "/:sensorId/stats",
+    getTelemetryStats
+);
 
-router.get("/:sensorId", getTelemetryBySensor);
+// Latest telemetry for sensor
+router.get(
+    "/:sensorId/latest",
+    getLatestTelemetryBySensor
+);
+
+// Telemetry for sensor
+router.get(
+    "/:sensorId",
+    getTelemetryBySensor
+);
+
+// All telemetry
+router.get(
+    "/",
+    getAllTelemetry
+);
 
 module.exports = router;

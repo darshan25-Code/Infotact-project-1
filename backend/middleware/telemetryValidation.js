@@ -7,15 +7,25 @@ const validateTelemetry = (req, res, next) => {
         timestamp
     } = req.body;
 
-    // sensorId validation
-    if (!sensorId || typeof sensorId !== "string" || !sensorId.trim()) {
+    // --------------------------------
+    // Sensor ID
+    // --------------------------------
+
+    if (
+        !sensorId ||
+        typeof sensorId !== "string" ||
+        !sensorId.trim()
+    ) {
         return res.status(400).json({
             success: false,
             message: "Valid sensorId is required"
         });
     }
 
-    // At least one telemetry value
+    // --------------------------------
+    // At least one value
+    // --------------------------------
+
     if (
         temperature === undefined &&
         humidity === undefined &&
@@ -23,22 +33,33 @@ const validateTelemetry = (req, res, next) => {
     ) {
         return res.status(400).json({
             success: false,
-            message: "At least one telemetry value is required"
+            message:
+                "At least one telemetry value is required"
         });
     }
 
-    // Temperature validation
+    // --------------------------------
+    // Temperature
+    // --------------------------------
+
     if (
         temperature !== undefined &&
-        (typeof temperature !== "number" || !Number.isFinite(temperature))
+        (
+            typeof temperature !== "number" ||
+            !Number.isFinite(temperature)
+        )
     ) {
         return res.status(400).json({
             success: false,
-            message: "Temperature must be a valid number"
+            message:
+                "Temperature must be a valid number"
         });
     }
 
-    // Humidity validation
+    // --------------------------------
+    // Humidity
+    // --------------------------------
+
     if (
         humidity !== undefined &&
         (
@@ -50,30 +71,44 @@ const validateTelemetry = (req, res, next) => {
     ) {
         return res.status(400).json({
             success: false,
-            message: "Humidity must be between 0 and 100"
+            message:
+                "Humidity must be between 0 and 100"
         });
     }
 
-    // Pressure validation
+    // --------------------------------
+    // Pressure
+    // --------------------------------
+
     if (
         pressure !== undefined &&
-        (typeof pressure !== "number" || !Number.isFinite(pressure))
+        (
+            typeof pressure !== "number" ||
+            !Number.isFinite(pressure) ||
+            pressure <= 0
+        )
     ) {
         return res.status(400).json({
             success: false,
-            message: "Pressure must be a valid number"
+            message:
+                "Pressure must be a positive number"
         });
     }
 
-    // Timestamp validation
-    if (
-        timestamp !== undefined &&
-        isNaN(new Date(timestamp).getTime())
-    ) {
-        return res.status(400).json({
-            success: false,
-            message: "Timestamp must be a valid date"
-        });
+    // --------------------------------
+    // Timestamp
+    // --------------------------------
+
+    if (timestamp !== undefined) {
+        const parsedTimestamp = new Date(timestamp);
+
+        if (isNaN(parsedTimestamp.getTime())) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Timestamp must be a valid date"
+            });
+        }
     }
 
     next();
